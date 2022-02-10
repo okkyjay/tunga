@@ -21,6 +21,9 @@ class CreateUsersTable extends Migration
             $table->dateTime('date_of_birth')->nullable();
             $table->string('interest')->nullable();
             $table->longText('description')->nullable();
+            $table->string('account')->nullable();
+            $table->boolean('checked')->nullable();
+            $table->json('credit_card')->nullable();
             $table->string('password')->default('tungachallenge#$');
             $table->rememberToken();
             $table->timestamps();

@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\User;
+use App\Traits\Helper;
+use Carbon\Carbon;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -13,7 +15,7 @@ use Illuminate\Queue\SerializesModels;
 
 class JsonJob implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Helper;
 
     private $item;
 
@@ -34,23 +36,11 @@ class JsonJob implements ShouldQueue
      */
     public function handle()
     {
-        $user = User::where(['email' => $this->item->email])->first();
-        if (!$user){
-            $newUser = User::create([
-                'name' => $this->item->name,
-                'address' => $this->item->address,
-                'date_of_birth' => $this->item->date_of_birth,
-                'email' => $this->item->email,
-                'interest' => $this->item->interest,
-                'description' => $this->item->description,
-            ]);
-
-            $newUser->account()->create([
-                'account_id' => $this->item->account,
-                'checked' => $this->item->checked,
-                'credit_card_meta' => json_encode($this->item->credit_card),
-            ]);
+        foreach ($this->item as $item){
+            $item = $this->prepareForDB($item);
+            User::upsert($item, 'email');
         }
+
 
     }
 }

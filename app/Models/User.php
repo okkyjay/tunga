@@ -34,11 +34,16 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'credit_card_meta',
-        'user_id',
-        'account_number',
-        'credit_card_meta',
+        'name',
+        'email',
+        'password',
+        'address',
+        'date_of_birth',
+        'interest',
+        'description',
+        'account',
         'checked',
+        'credit_card'
     ];
 
     /**
@@ -68,4 +73,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function setCreditCardAttribute($value)
+    {
+        $this->attributes['credit_card'] = $value ? json_encode($value): null;
+    }
 }

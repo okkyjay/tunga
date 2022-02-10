@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\JsonJob;
+use App\Traits\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 
 class HomeController extends Controller
 {
+    use Helper;
     public function store(): string
     {
-        $path = url('challenge.xml');
+        $path = url('challenge.json');
 
         $explode = explode('.', $path);
         $extension = $explode[count($explode) - 1];
@@ -21,7 +23,6 @@ class HomeController extends Controller
         if ($extension == 'json'){
             $content = file_get_contents('./challenge.json');
             $items =  collect(json_decode($content))->sortByDesc('date_of_birth');
-            //exit(var_dump($items));
         }elseif ($extension == 'csv'){
 
         }elseif ($extension == 'xml'){
@@ -32,20 +33,17 @@ class HomeController extends Controller
             $items =  collect(json_decode($raw))->sortByDesc('date_of_birth');
         }
 
+        $items = $items->filter( function ($item){
+            return $this->filterCollectionData($item);
+        });
+
+        $items = json_decode(json_encode($items->toArray()), true);
+        $items = array_chunk($items, 500);
         $batch  = Bus::batch([])->dispatch();
         foreach($items as $item){
-            $age = $date = null;
-            if(!is_null($item->date_of_birth)){
-                $dob = str_replace('/', '-',$item->date_of_birth);
-                $date = Carbon::parse($dob);
-                $age = $date->diffInYears(now());
-            }
-            if(is_null($age) || ($age >= 18 && $age <= 65)){
-                $item->date_of_birth = $date;
-                //dispatch();
-                $batch->add(new JsonJob($item));
-            }
+            $batch->add(new JsonJob($item));
         }
+        Artisan::call('queue:work --tries=3');
         return back()->with(['success' => 'Jobs running....']);
     }
 }
