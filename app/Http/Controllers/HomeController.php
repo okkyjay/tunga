@@ -43,7 +43,7 @@ class HomeController extends Controller
         foreach($items as $item){
             $batch->add(new JsonJob($item));
         }
-        Artisan::call('queue:work --tries=3');
+        //Artisan::call('queue:work --tries=3');
         return back()->with(['success' => 'Jobs running....']);
     }
 }
