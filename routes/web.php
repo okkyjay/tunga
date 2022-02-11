@@ -16,4 +16,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/load', [\App\Http\Controllers\HomeController::class, 'store'])->name('store.user.info');
+Route::POST('/load', [\App\Http\Controllers\HomeController::class, 'store'])->name('store.user.info');
