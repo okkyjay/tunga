@@ -22,16 +22,13 @@ class HomeController extends Controller
 
     public function store(FileRequest $request)
     {
-        $items = $this->processFileUpload->processFile($request);
-        if (count($items) > 0){
-            $items = array_chunk($items, 500);
+        $filePath = $this->processFileUpload->processFile($request);
+        if ($filePath){
             $batch  = Bus::batch([])->dispatch();
-            foreach($items as $item){
-                $batch->add(new FileUploadJob((array)$item, $this->userInterface));
-            }
+            $batch->add(new FileUploadJob($filePath));
             return back()->with(['success' => 'Jobs running....']);
         }
 
-        return back()->with(['success' => 'No data to process....']);
+        return back()->with(['error' => 'No data to process....']);
     }
 }

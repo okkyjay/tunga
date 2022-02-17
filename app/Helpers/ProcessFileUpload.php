@@ -11,48 +11,46 @@ class ProcessFileUpload
 {
     use Helper;
 
-    private $processJson;
-    private $processXML;
+    private $fileParser;
     private $extension;
-    public function __construct(ProcessJsonFile $processJsonFile, ProcessXmlFile $processXML)
+
+    public function __construct(FileParser $fileParser, $extension = null)
     {
-        $this->processJson = $processJsonFile;
-        $this->processXML = $processXML;
+        $this->extension = $extension;
+        $this->fileParser = $fileParser;
     }
 
     public function processFile($fileRequest)
     {
         $path = 'public/file';
-        $filePath = $this->saveFile($fileRequest, $path);
-        $items = $this->processFileData($filePath);
-        $items = $items->filter( function ($item){
-            return $this->filterCollectionData($item);
-        });
-        $items = json_decode(json_encode($items->toArray()), true);
-        return $items;
+        return $filePath = $this->saveFile($fileRequest, $path);
     }
 
-    private function getFileExtension()
+    public function getFileExtension()
     {
         return $this->extension;
     }
 
-    private function processFileData($file)
+    public function processFileData($file)
     {
         $items = null;
         $extension = $this->getFileExtension();
-        if ($extension == 'json'){
-            $items = $this->processJson->process($file);
-        }elseif ($extension == 'xml'){
-            $items = $this->processXML->process($file);
-        }elseif ($extension == 'csv'){
-            return false;
+        if (!$extension){
+            $f = explode('.', $file);
+            $extension = $f[count($f) - 1];
+            $this->extension = $extension;
         }
-        return $items;
+        if ($extension == 'json'){
+            return $this->fileParser->json($file);
+        }elseif ($extension == 'xml'){
+            return $this->fileParser->xml($file);
+        }elseif ($extension == 'csv'){
+            return $this->fileParser->csv($file);
+        }
+        return false;
     }
 
     public function saveFile($file, $path){
-
         // Get filename with the extension
         $filenameWithExt = $file->file('file')->getClientOriginalName();
         //Get just filename

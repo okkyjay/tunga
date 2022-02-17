@@ -30,6 +30,9 @@
                 @if(session()->has('success'))
                     <p style="color:green">{{session('success')}}</p>
                 @endif
+                @if(session()->has('error'))
+                    <p style="color:red">{{session('error')}}</p>
+                @endif
             </h3>
 
         </div>

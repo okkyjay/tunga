@@ -7,22 +7,24 @@ namespace App\Helpers;
 use App\Interfaces\ProcessFileInterface;
 use App\Interfaces\User\UserRepositoryInterface;
 use App\Traits\Helper;
-use Tightenco\Collect\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Rodenastyle\StreamParser\StreamParser;
+use Tightenco\Collect\Support\Collection;
 
-class ProcessJsonFile implements ProcessFileInterface
+class ProcessCSVlFile implements ProcessFileInterface
 {
     use Helper;
+
     public $userInterface;
 
     public function __construct(UserRepositoryInterface $userInterface){
         $this->userInterface = $userInterface;
     }
+
     public function process($filePath)
     {
         $path = Storage::path($filePath);
-        StreamParser::json($path)->each(function (Collection $user){
+        StreamParser::csv($path)->each(function (Collection $user){
             $user = json_decode($user, true);
             $filter = $this->filterCollectionData($user);
             if ($filter){
@@ -30,6 +32,6 @@ class ProcessJsonFile implements ProcessFileInterface
                 $this->userInterface->createUser($user);
             }
         });
-        return  true;
+        return true;
     }
 }

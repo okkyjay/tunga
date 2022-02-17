@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Exceptions\User\CreateUserErrorException;
+use App\Helpers\ProcessFileUpload;
+use App\Http\Requests\User\FileRequest;
 use App\Interfaces\User\UserRepositoryInterface;
 use App\Traits\Helper;
 use Illuminate\Bus\Batchable;
@@ -10,6 +12,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -20,38 +23,24 @@ class FileUploadJob implements ShouldQueue
     /**
      * @var
      */
-    private $item;
-    /**
-     * @var UserRepositoryInterface
-     */
-    private $userRepo;
+    private $filePath;
+
 
 
     /**
      * JsonJob constructor.
-     * @param UserRepositoryInterface $userRepository
-     * @param $item
+     * @param $filePath
      */
-    public function __construct(array $item, UserRepositoryInterface $userRepository)
+    public function __construct($filePath)
     {
-        $this->item = $item;
-        $this->userRepo = $userRepository;
+        $this->filePath = $filePath;
     }
 
     /**
-     * Execute the job.
-     *
-     * @return void
+     * @param ProcessFileUpload $processFileUpload
      */
-    public function handle()
+    public function handle(ProcessFileUpload $processFileUpload)
     {
-        foreach ($this->item as $item){
-            (array)$item = $this->prepareForDB($item);
-            try {
-                $this->userRepo->createUser($item);
-            }catch (\Exception $e){
-                throw new CreateUserErrorException($e);
-            }
-        }
+         $processFileUpload->processFileData($this->filePath);
     }
 }
