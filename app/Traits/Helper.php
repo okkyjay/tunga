@@ -4,6 +4,7 @@
 namespace App\Traits;
 
 
+use App\Classes\Hook;
 use Carbon\Carbon;
 
 trait Helper
@@ -18,7 +19,8 @@ trait Helper
         }
         if(is_null($age) || ($age >= 18 && $age <= 65)){
             $item['date_of_birth'] = $date;
-            return true;
+            $result = true;
+            return   $result = $this->fire_hook('filter.data', $result, array($item));
         }
         return false;
     }
@@ -47,5 +49,28 @@ trait Helper
         }
         $item['date_of_birth'] = isset($item['date_of_birth'])?Carbon::parse($item['date_of_birth'])->format('Y-m-d'):null;
         return $item;
+    }
+    /**
+     * Function to fire several events  attached to a hook
+     * @param $event
+     * @param null $values
+     * @param array $param
+     * @return mixed|null
+     * @internal param null $callback
+     */
+    public function fire_hook($event, $values = null, $param = array()) {
+        $hook = Hook::getInstance();
+        return $hook->attachOrFire($event, $values, $callback = null, $param);
+    }
+
+    public /**
+     * Function to attach several callback to an event
+     * @param $event
+     * @param null $callback
+     * @return mixed|null
+     */
+    function register_hook($event, $callback) {
+        $hook = Hook::getInstance();
+        $hook->attachOrFire($event, $values = null, $callback);
     }
 }

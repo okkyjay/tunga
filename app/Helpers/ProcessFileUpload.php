@@ -33,21 +33,8 @@ class ProcessFileUpload
 
     public function processFileData($file)
     {
-        $items = null;
         $extension = $this->getFileExtension();
-        if (!$extension){
-            $f = explode('.', $file);
-            $extension = $f[count($f) - 1];
-            $this->extension = $extension;
-        }
-        if ($extension == 'json'){
-            return $this->fileParser->json($file);
-        }elseif ($extension == 'xml'){
-            return $this->fileParser->xml($file);
-        }elseif ($extension == 'csv'){
-            return $this->fileParser->csv($file);
-        }
-        return false;
+        return $this->fileParser->processFileBYExtension($file, $extension);
     }
 
     public function saveFile($file, $path){
