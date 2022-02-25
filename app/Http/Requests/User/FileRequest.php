@@ -7,14 +7,24 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Class FileRequest
+ * @package App\Http\Requests\User
+ */
 class FileRequest extends FormRequest
 {
+    /**
+     * @return bool
+     */
     public function authorize()
     {
         return true;
 
     }
 
+    /**
+     * @return string[]
+     */
     public function rules()
     {
         return [
@@ -23,6 +33,10 @@ class FileRequest extends FormRequest
 
     }
 
+    /**
+     * @param Validator $validator
+     * @throws ValidationException
+     */
     protected function failedValidation(Validator $validator)
     {
 

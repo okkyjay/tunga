@@ -11,19 +11,31 @@ use Illuminate\Support\Facades\Storage;
 use Rodenastyle\StreamParser\StreamParser;
 use Tightenco\Collect\Support\Collection;
 
-class ProcessXmlFileq implements ProcessFileInterface
+class ProcessCSVFile implements ProcessFileInterface
 {
     use Helper;
 
+    /**
+     * @var UserRepositoryInterface
+     */
     public $userInterface;
 
+    /**
+     * ProcessCSVFile constructor.
+     * @param UserRepositoryInterface $userInterface
+     */
     public function __construct(UserRepositoryInterface $userInterface){
         $this->userInterface = $userInterface;
     }
+
+    /**
+     * @param $filePath
+     * @return bool
+     */
     public function process($filePath)
     {
         $path = Storage::path($filePath);
-        StreamParser::xml($path)->each(function (Collection $user){
+        StreamParser::csv($path)->each(function (Collection $user){
             $user = json_decode($user, true);
             $filter = $this->filterCollectionData($user);
             if ($filter){

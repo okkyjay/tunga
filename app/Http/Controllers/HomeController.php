@@ -9,17 +9,38 @@ use App\Jobs\FileUploadJob;
 use App\Traits\Helper;
 use Illuminate\Support\Facades\Bus;
 
+/**
+ * Class HomeController
+ * @package App\Http\Controllers
+ */
 class HomeController extends Controller
 {
     use Helper;
+
+    /**
+     * @var ProcessFileUpload
+     */
     public $processFileUpload;
+    /**
+     * @var UserRepositoryInterface
+     */
     public $userInterface;
 
+    /**
+     * HomeController constructor.
+     * @param ProcessFileUpload $processFileUpload
+     * @param UserRepositoryInterface $userInterface
+     */
     public function __construct(ProcessFileUpload $processFileUpload, UserRepositoryInterface $userInterface){
         $this->processFileUpload = $processFileUpload;
         $this->userInterface = $userInterface;
     }
 
+    /**
+     * @param FileRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Throwable
+     */
     public function store(FileRequest $request)
     {
         $filePath = $this->processFileUpload->processFile($request);

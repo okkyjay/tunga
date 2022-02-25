@@ -19,14 +19,14 @@ class FileParser
     }
     public function xml($filePath)
     {
-        return (new ProcessXmlFileq($this->userInterface))->process($filePath);
+        return (new ProcessXmlFile($this->userInterface))->process($filePath);
     }
     public function csv($filePath)
     {
-        return (new ProcessCSVlFile($this->userInterface))->process($filePath);
+        return (new ProcessCSVFile($this->userInterface))->process($filePath);
     }
 
-    public function processFileBYExtension($filePath, $extension)
+    public function processFileByExtension($filePath, $extension)
     {
         if (!$extension){
             $f = explode('.', $filePath);
@@ -40,7 +40,7 @@ class FileParser
                 return false;
             }
         }catch (\Exception $exception){
-
+            abort(500);
         }
     }
 }
